@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма и валидация</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        label, p {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Пользовательская форма</h1>
+    
+    <!-- Форма с различными элементами управления -->
+    <form id="userForm">
+        <!-- Текстовое поле -->
+        <label for="username">Имя пользователя:</label>
+        <input type="text" id="username" name="username" required minlength="3" placeholder="Введите ваше имя">
+
+        <!-- Email -->
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required placeholder="Введите ваш email">
+
+        <!-- Телефон -->
+        <label for="phone">Телефон:</label>
+        <input type="tel" id="phone" name="phone" required placeholder="Введите ваш телефон">
+
+        <!-- Флажок -->
+        <label>
+            <input type="checkbox" id="subscribe" name="subscribe"> Подписаться на новости
+        </label>
+
+        <!-- Переключатели -->
+        <p>Пол:</p>
+        <label><input type="radio" name="gender" value="муж" required> Мужчина</label>
+        <label><input type="radio" name="gender" value="жен" required> Женщина</label>
+
+        <!-- Выпадающий список -->
+        <label for="country">Страна:</label>
+        <select id="country" name="country" required>
+            <option value="">Выберите страну</option>
+            <option value="ru">Россия</option>
+            <option value="bober">Польша</option>
+            <option value="by">Беларусь</option>
+        </select>
+
+        <!-- Кнопка отправки -->
+        <button type="submit">Отправить</button>
+    </form>
+
+    <!-- Блок для вывода данных -->
+    <h2>Полученные данные:</h2>
+    <div id="output"></div>
+
+    <script>
+        // Получаем ссылку на форму и блок вывода
+        const form = document.getElementById('userForm');
+        const output = document.getElementById('output');
+
+        // Обработчик отправки формы
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Предотвращаем перезагрузку страницы
+
+            // Получаем данные из полей формы
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const subscribe = document.getElementById('subscribe').checked;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+            const country = document.getElementById('country').value;
+
+            // Проверка на заполнение всех полей
+            if (!username || !email || !phone || !gender || !country) {
+                alert('Пожалуйста, заполните все обязательные поля!');
+                return;
+            }
+
+            // Выводим данные на страницу
+            output.innerHTML = `
+                <p><strong>Имя пользователя:</strong> ${username}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Телефон:</strong> ${phone}</p>
+                <p><strong>Подписка:</strong> ${subscribe ? 'Да' : 'Нет'}</p>
+                <p><strong>Пол:</strong> ${gender}</p>
+                <p><strong>Страна:</strong> ${country}</p>
+            `;
+        });
+
+        // Валидация через JS и регулярные выражения
+        document.getElementById('username').addEventListener('input', function () {
+            const username = this.value;
+            const usernamePattern = /^[А-Яа-яЁёA-Za-z0-9_]{3,}$/; // Минимум 3 символа: буквы, цифры и подчёркивание
+
+            if (!usernamePattern.test(username)) {
+                this.setCustomValidity('Имя пользователя должно содержать только буквы (русские или латинские), цифры и быть не короче 3 символов.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.getElementById('email').addEventListener('input', function () {
+            const email = this.value;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (!emailPattern.test(email)) {
+                this.setCustomValidity('Введите корректный email.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.getElementById('phone').addEventListener('input', function () {
+            const phone = this.value;
+            const phonePattern = /^\+?[0-9]{10,15}$/;
+
+            if (!phonePattern.test(phone)) {
+                this.setCustomValidity('Введите корректный номер телефона (10-15 цифр, можно с плюсом в начале).');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+    </script>
+</body>
+</html>

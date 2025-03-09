@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="windows-1251">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Туры и путешествия</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .catalog, .cart {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        .tour-card {
+            border-bottom: 1px solid #ccc;
+            padding: 15px 0;
+        }
+        .tour-card h3 {
+            margin: 0;
+        }
+        .tour-card p {
+            margin: 5px 0;
+        }
+        .tour-card button {
+            padding: 10px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .tour-card button:hover {
+            background-color: #45a049;
+        }
+        .cart-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+        .cart-item span {
+            font-weight: bold;
+        }
+        .cart-total {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button#checkout {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button#checkout:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Каталог туров</h2>
+
+    <div class="catalog" id="catalog"></div>
+
+    <h2>Корзина</h2>
+
+    <div class="cart" id="cart">
+        <div id="cart-items"></div>
+        <div class="cart-total" id="cart-total">Итого: 0 руб.</div>
+        <button id="checkout">Оформить заказ</button>
+    </div>
+
+    <script>
+        let catalog = [];
+        let cart = [];
+
+        // Загрузка каталога из JSON-файла
+      fetch('./catalog.json')
+    .then(response => response.json())
+    .then(data => {
+        catalog = data;
+        displayCatalog();
+    })
+    .catch(error => console.error('Ошибка загрузки JSON:', error));
+
+
+        // Отображение каталога туров
+        function displayCatalog() {
+            const catalogContainer = document.getElementById('catalog');
+            catalogContainer.innerHTML = '';
+            catalog.forEach(tour => {
+                const tourElement = document.createElement('div');
+                tourElement.className = 'tour-card';
+                tourElement.innerHTML = `
+                    <h3>${tour.name}</h3>
+                    <p><strong>Место:</strong> ${tour.location}</p>
+                    <p><strong>Дата:</strong> ${tour.date}</p>
+                    <p><strong>Цена:</strong> ${tour.price} руб.</p>
+                    <button onclick="addToCart(${tour.id})">Добавить в корзину</button>
+                `;
+                catalogContainer.appendChild(tourElement);
+            });
+        }
+
+        // Добавление тура в корзину
+        function addToCart(id) {
+            const tour = catalog.find(item => item.id === id);
+            const cartItem = cart.find(item => item.id === id);
+            if (cartItem) {
+                cartItem.quantity++;
+            } else {
+                cart.push({ ...tour, quantity: 1 });
+            }
+            displayCart();
+        }
+
+        // Отображение корзины
+        function displayCart() {
+            const cartContainer = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            cartContainer.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                cartContainer.innerHTML += `
+                    <div class="cart-item">
+                        <span>${item.name}</span> - ${item.quantity} шт. - ${item.price * item.quantity} руб.
+                    </div>
+                `;
+            });
+            cartTotal.innerText = `Итого: ${total} руб.`;
+        }
+
+        // Оформление заказа
+        document.getElementById('checkout').addEventListener('click', function () {
+            if (cart.length === 0) {
+                alert('Корзина пуста!');
+                return;
+            }
+            alert('Заказ оформлен!');
+            cart = [];
+            displayCart();
+        });
+    </script>
+</body>
+</html>
