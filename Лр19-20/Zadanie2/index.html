@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="windows-1251">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личные данные и работа с Cookie</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .personal-data {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #cookieData {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .cookie-action-btns {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .cookie-action-btns button {
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+    <div class="personal-data">
+        <h2>Введите ваши личные данные</h2>
+        <form id="personalDataForm" onsubmit="saveDataToCookies(); return false;">
+            <label for="fullName">ФИО:</label>
+            <input type="text" id="fullName" required>
+
+            <label for="email">Электронная почта:</label>
+            <input type="email" id="email" required>
+
+            <label for="birthDate">Дата рождения:</label>
+            <input type="date" id="birthDate" required>
+
+            <label for="birthPlace">Место рождения:</label>
+            <input type="text" id="birthPlace" required>
+
+            <label for="hobbies">Увлечения:</label>
+            <textarea id="hobbies" rows="3"></textarea>
+
+            <button type="submit">Сохранить в Cookie</button>
+        </form>
+
+        <div class="cookie-action-btns">
+            <button onclick="getDataFromCookies()">Получить данные</button>
+            <button onclick="clearCookies()">Очистить Cookie</button>
+        </div>
+
+        <div id="cookieData"></div>
+    </div>
+
+    <script>
+        // Функция для сохранения данных в Cookie
+        function saveDataToCookies() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const birthDate = document.getElementById('birthDate').value;
+            const birthPlace = document.getElementById('birthPlace').value;
+            const hobbies = document.getElementById('hobbies').value;
+
+            // Сохранение данных в Cookie с указанием пути и времени жизни Cookie
+            document.cookie = `fullName=${encodeURIComponent(fullName)}; max-age=3600; path=/`;
+            document.cookie = `email=${encodeURIComponent(email)}; max-age=3600; path=/`;
+            document.cookie = `birthDate=${encodeURIComponent(birthDate)}; max-age=3600; path=/`;
+            document.cookie = `birthPlace=${encodeURIComponent(birthPlace)}; max-age=3600; path=/`;
+            document.cookie = `hobbies=${encodeURIComponent(hobbies)}; max-age=3600; path=/`;
+
+            alert("Данные успешно сохранены в Cookie.");
+        }
+
+        // Функция для получения данных из Cookie
+        function getDataFromCookies() {
+            const cookies = document.cookie.split('; ');
+            let cookieData = '';
+
+            cookies.forEach(cookie => {
+                const [name, value] = cookie.split('=');
+                if (value) {
+                    cookieData += `<p><strong>${name}:</strong> ${decodeURIComponent(value)}</p>`;
+                }
+            });
+
+            document.getElementById('cookieData').innerHTML = cookieData || 'Нет данных в Cookie.';
+        }
+
+        // Функция для очистки Cookie
+        function clearCookies() {
+            const cookies = document.cookie.split('; ');
+
+            cookies.forEach(cookie => {
+                const name = cookie.split('=')[0];
+                document.cookie = `${name}=; max-age=0; path=/`;
+            });
+
+            document.getElementById('cookieData').innerHTML = 'Cookie очищены.';
+            alert("Все Cookie удалены.");
+        }
+    </script>
+</body>
+</html>

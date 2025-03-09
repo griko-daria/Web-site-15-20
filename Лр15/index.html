@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="window-1251">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Избеги астероидов - Браузерная игра</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #gameArea {
+            width: 600px;
+            height: 400px;
+            border: 2px solid black;
+            margin: 20px auto;
+            position: relative;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .ship {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            background-color: cyan;
+            border-radius: 50%;
+        }
+
+        .asteroid {
+            width: 30px;
+            height: 30px;
+            position: absolute;
+            background-color: gray;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Избеги астероидов</h1>
+    <p>Используйте клавиши стрелок для управления кораблём.</p>
+    <p id="score">Счёт: 0</p>
+    <div id="gameArea"></div>
+
+    <script>
+        // Базовый класс для объектов игры (инкапсуляция)
+        class GameObject {
+            constructor(x, y, className) {
+                this.x = x;
+                this.y = y;
+                this.element = document.createElement('div');
+                this.element.className = className;
+                this.updatePosition();
+                document.getElementById('gameArea').appendChild(this.element);
+            }
+
+            // Обновление позиции объекта на экране
+            updatePosition() {
+                this.element.style.left = this.x + 'px';
+                this.element.style.top = this.y + 'px';
+            }
+
+            // Удаление объекта из DOM
+            remove() {
+                this.element.remove();
+            }
+        }
+
+        // Класс корабля, наследующий GameObject (наследование)
+        class Ship extends GameObject {
+            constructor(x, y) {
+                super(x, y, 'ship');
+            }
+
+            // Метод перемещения корабля с проверкой границ игрового поля
+            move(dx, dy) {
+                const gameArea = document.getElementById('gameArea');
+                this.x = Math.max(0, Math.min(this.x + dx, gameArea.clientWidth - 40));
+                this.y = Math.max(0, Math.min(this.y + dy, gameArea.clientHeight - 40));
+                this.updatePosition();
+            }
+        }
+
+        // Класс астероида, наследующий GameObject (наследование)
+        class Asteroid extends GameObject {
+            constructor(x, y) {
+                super(x, y, 'asteroid');
+            }
+
+            // Метод падения астероида (полиморфизм)
+            fall() {
+                this.y += 5;
+                this.updatePosition();
+            }
+
+            // Проверка выхода за границы игрового поля
+            outOfBounds() {
+                return this.y > 400;
+            }
+
+            // Проверка столкновения астероида с кораблём
+            collideWith(ship) {
+                return (this.x < ship.x + 40 &&
+                        this.x + 30 > ship.x &&
+                        this.y < ship.y + 40 &&
+                        this.y + 30 > ship.y);
+            }
+        }
+
+        // Создание корабля и начальных переменных
+        const ship = new Ship(280, 350);
+        let asteroids = [];
+        let score = 0;
+        let gameOver = false; // Флаг для завершения игры
+
+        // Функция для появления астероидов на случайной позиции
+        function spawnAsteroid() {
+            if (!gameOver) {
+                const x = Math.floor(Math.random() * 570);
+                asteroids.push(new Asteroid(x, 0));
+            }
+        }
+
+        // Основной игровой цикл
+        function gameLoop() {
+            if (gameOver) return; // Остановка игрового цикла после завершения игры
+
+            asteroids.forEach((asteroid, index) => {
+                asteroid.fall();
+
+                // Если астероид вышел за границы игрового поля
+                if (asteroid.outOfBounds()) {
+                    asteroid.remove();
+                    asteroids.splice(index, 1);
+                    score += 10;
+                    document.getElementById('score').innerText = `Счёт: ${score}`;
+                }
+
+                // Проверка столкновения астероида с кораблём
+                if (asteroid.collideWith(ship)) {
+                    gameOver = true;
+                    alert(`Игра окончена! Ваш счёт: ${score}`);
+                    window.location.reload();
+                }
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Управление кораблём с помощью клавиш стрелок
+        document.addEventListener('keydown', (event) => {
+            if (!gameOver) {
+                switch (event.key) {
+                    case 'ArrowUp':
+                        ship.move(0, -10);
+                        break;
+                    case 'ArrowDown':
+                        ship.move(0, 10);
+                        break;
+                    case 'ArrowLeft':
+                        ship.move(-10, 0);
+                        break;
+                    case 'ArrowRight':
+                        ship.move(10, 0);
+                        break;
+                }
+            }
+        });
+
+        // Генерация астероидов и запуск игрового цикла
+        setInterval(spawnAsteroid, 1000);
+        gameLoop();
+    </script>
+</body>
+</html>

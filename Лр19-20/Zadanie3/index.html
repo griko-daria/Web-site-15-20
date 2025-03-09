@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="windows-1251">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личные данные и работа с Local Storage</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .personal-data {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #storageData {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .storage-action-btns {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .storage-action-btns button {
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+    <div class="personal-data">
+        <h2>Введите ваши личные данные</h2>
+        <form id="personalDataForm" onsubmit="saveDataToLocalStorage(); return false;">
+            <label for="fullName">ФИО:</label>
+            <input type="text" id="fullName" required>
+
+            <label for="email">Электронная почта:</label>
+            <input type="email" id="email" required>
+
+            <label for="birthDate">Дата рождения:</label>
+            <input type="date" id="birthDate" required>
+
+            <label for="birthPlace">Место рождения:</label>
+            <input type="text" id="birthPlace" required>
+
+            <label for="hobbies">Увлечения:</label>
+            <textarea id="hobbies" rows="3"></textarea>
+
+            <button type="submit">Сохранить в Local Storage</button>
+        </form>
+
+        <div class="storage-action-btns">
+            <button onclick="getDataFromLocalStorage()">Получить данные</button>
+            <button onclick="clearLocalStorage()">Очистить Local Storage</button>
+        </div>
+
+        <div id="storageData"></div>
+    </div>
+
+    <script>
+        // Функция для сохранения данных в Local Storage
+        function saveDataToLocalStorage() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const birthDate = document.getElementById('birthDate').value;
+            const birthPlace = document.getElementById('birthPlace').value;
+            const hobbies = document.getElementById('hobbies').value;
+
+            localStorage.setItem('fullName', fullName);
+            localStorage.setItem('email', email);
+            localStorage.setItem('birthDate', birthDate);
+            localStorage.setItem('birthPlace', birthPlace);
+            localStorage.setItem('hobbies', hobbies);
+
+            alert("Данные сохранены в Local Storage.");
+        }
+
+        // Функция для получения данных из Local Storage
+        function getDataFromLocalStorage() {
+            const fullName = localStorage.getItem('fullName');
+            const email = localStorage.getItem('email');
+            const birthDate = localStorage.getItem('birthDate');
+            const birthPlace = localStorage.getItem('birthPlace');
+            const hobbies = localStorage.getItem('hobbies');
+
+            if (fullName && email && birthDate && birthPlace) {
+                const storageData = `
+                    <p><strong>ФИО:</strong> ${fullName}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Дата рождения:</strong> ${birthDate}</p>
+                    <p><strong>Место рождения:</strong> ${birthPlace}</p>
+                    <p><strong>Увлечения:</strong> ${hobbies}</p>
+                `;
+                document.getElementById('storageData').innerHTML = storageData;
+            } else {
+                document.getElementById('storageData').innerHTML = 'Нет данных в Local Storage.';
+            }
+        }
+
+        // Функция для очистки Local Storage
+        function clearLocalStorage() {
+            localStorage.clear();
+            document.getElementById('storageData').innerHTML = 'Local Storage очищен.';
+            alert("Все данные удалены из Local Storage.");
+        }
+    </script>
+</body>
+</html>
